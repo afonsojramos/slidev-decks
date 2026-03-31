@@ -60,7 +60,7 @@ export async function build(
   const matches = query ? fuzzyMatch(decks, query) : [];
   const deck = await resolveDeck(decks, matches, query);
 
-  if (!deck) process.exit(0);
+  if (!deck) { process.exit(0); return; }
 
   outro(`Building ${pc.bold(deck.name)}`);
 

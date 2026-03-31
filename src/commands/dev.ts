@@ -26,7 +26,7 @@ export async function dev(query?: string, options: { open?: boolean; port?: stri
   const matches = query ? fuzzyMatch(decks, query) : [];
   const deck = await resolveDeck(decks, matches, query);
 
-  if (!deck) process.exit(0);
+  if (!deck) { process.exit(0); return; }
 
   outro(`Starting ${pc.bold(deck.name)}`);
 

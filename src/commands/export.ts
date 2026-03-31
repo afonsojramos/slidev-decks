@@ -17,7 +17,7 @@ export async function exportDeck(query?: string, options: { format?: string; out
   const matches = query ? fuzzyMatch(decks, query) : [];
   const deck = await resolveDeck(decks, matches, query);
 
-  if (!deck) process.exit(0);
+  if (!deck) { process.exit(0); return; }
 
   outro(`Exporting ${pc.bold(deck.name)}`);
 

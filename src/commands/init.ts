@@ -49,7 +49,7 @@ function runInstall(pm: string, pkg: string, cwd: string): Promise<number> {
 
   return new Promise((resolve) => {
     const child = spawn(pm, args, { cwd, stdio: "pipe" });
-    child.on("close", (code) => resolve(code ?? 1));
+    child.on("close", (code: number | null) => resolve(code ?? 1));
     child.on("error", () => resolve(1));
   });
 }
@@ -85,8 +85,9 @@ export async function init() {
       },
     ],
   });
-  if (isCancel(templateStyle)) { cancel("Cancelled"); process.exit(0); }
+  if (isCancel(templateStyle)) { cancel("Cancelled"); process.exit(0); return; }
 
+  const style = templateStyle as TemplateStyle;
   const pm = detectPackageManager(cwd);
   const s = spinner();
 
@@ -121,12 +122,12 @@ export async function init() {
   const templateDir = join(cwd, "decks", "_template");
   mkdirSync(templateDir, { recursive: true });
 
-  const templates = getTemplates(templateStyle as TemplateStyle);
+  const templates = getTemplates(style);
 
   writeFileSync(join(templateDir, "slides.md"), templates.slides);
   writeFileSync(join(templateDir, "style.css"), templates.css);
   writeFileSync(join(templateDir, "package.json"), DECK_PACKAGE_JSON);
-  s.stop(`Created decks/_template/ (${templateStyle})`);
+  s.stop(`Created decks/_template/ (${style})`);
 
   // 4. Create .gitignore if needed
   const gitignorePath = join(cwd, ".gitignore");
@@ -148,7 +149,7 @@ export async function init() {
       `${pc.bold("Scripts added:")}`,
       ...Object.entries(SCRIPTS).map(([k, v]) => `  ${pc.cyan(k.padEnd(8))} → ${v}`),
       "",
-      `${pc.bold("Template:")} decks/_template/ (${templateStyle})`,
+      `${pc.bold("Template:")} decks/_template/ (${style})`,
     ].join("\n"),
     "Setup complete"
   );

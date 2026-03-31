@@ -61,7 +61,7 @@ export function runSlidev(
       shell: false,
     });
 
-    child.on("close", (code) => resolve(code ?? 1));
+    child.on("close", (code: number | null) => resolve(code ?? 1));
     child.on("error", () => resolve(1));
   });
 }
