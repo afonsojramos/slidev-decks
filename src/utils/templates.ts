@@ -1,4 +1,39 @@
-export const SLIDES_TEMPLATE = `---
+export const MINIMAL_SLIDES_TEMPLATE = `---
+theme: default
+title: {{TITLE}}
+info: |
+  {{DESCRIPTION}}
+drawings:
+  persist: false
+transition: slide-left
+mdc: true
+---
+
+# {{TITLE}}
+
+{{SUBTITLE}}
+
+---
+
+## Agenda
+
+- Topic one
+- Topic two
+- Topic three
+
+---
+layout: center
+---
+
+# Thank You
+
+Questions?
+`;
+
+export const MINIMAL_STYLE_TEMPLATE = `/* Add your custom styles here */
+`;
+
+export const STYLED_SLIDES_TEMPLATE = `---
 theme: seriph
 layout: cover
 title: {{TITLE}}
@@ -161,7 +196,7 @@ Open the floor for questions.
 -->
 `;
 
-export const STYLE_TEMPLATE = `@import url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin.css');
+export const STYLED_STYLE_TEMPLATE = `@import url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin.css');
 @import url('https://cdn.jsdelivr.net/fontsource/fonts/geist-mono@latest/latin.css');
 
 :root {
@@ -303,6 +338,15 @@ export const DECK_PACKAGE_JSON = `{
   }
 }
 `;
+
+export type TemplateStyle = "minimal" | "styled";
+
+export function getTemplates(style: TemplateStyle) {
+  return {
+    slides: style === "styled" ? STYLED_SLIDES_TEMPLATE : MINIMAL_SLIDES_TEMPLATE,
+    css: style === "styled" ? STYLED_STYLE_TEMPLATE : MINIMAL_STYLE_TEMPLATE,
+  };
+}
 
 export function applyReplacements(
   template: string,

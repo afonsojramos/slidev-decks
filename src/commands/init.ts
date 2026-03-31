@@ -2,6 +2,9 @@ import {
   intro,
   outro,
   spinner,
+  select,
+  cancel,
+  isCancel,
   note,
 } from "@clack/prompts";
 import pc from "picocolors";
@@ -9,7 +12,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { spawn } from "child_process";
 import { detectPackageManager } from "../utils/runner.js";
-import { SLIDES_TEMPLATE, STYLE_TEMPLATE, DECK_PACKAGE_JSON, applyReplacements } from "../utils/templates.js";
+import { getTemplates, DECK_PACKAGE_JSON, type TemplateStyle } from "../utils/templates.js";
 
 const SCRIPTS = {
   dev: "slidev-decks",
@@ -66,6 +69,24 @@ export async function init() {
     writeFileSync(pkgPath, JSON.stringify({ name: "my-talks", private: true }, null, 2) + "\n");
   }
 
+  // Ask for template style
+  const templateStyle = await select({
+    message: "Template style",
+    options: [
+      {
+        value: "minimal" as TemplateStyle,
+        label: "Minimal",
+        hint: "Slidev defaults, no custom CSS",
+      },
+      {
+        value: "styled" as TemplateStyle,
+        label: "Styled",
+        hint: "dark mode, Geist font, callouts, gradients",
+      },
+    ],
+  });
+  if (isCancel(templateStyle)) { cancel("Cancelled"); process.exit(0); }
+
   const pm = detectPackageManager(cwd);
   const s = spinner();
 
@@ -100,28 +121,12 @@ export async function init() {
   const templateDir = join(cwd, "decks", "_template");
   mkdirSync(templateDir, { recursive: true });
 
-  const templateReplacements = {
-    TITLE: "{{TITLE}}",
-    SUBTITLE: "{{SUBTITLE}}",
-    DESCRIPTION: "{{DESCRIPTION}}",
-    AUTHOR: "{{AUTHOR}}",
-    YEAR: "{{YEAR}}",
-    NAME: "{{NAME}}",
-  };
+  const templates = getTemplates(templateStyle as TemplateStyle);
 
-  writeFileSync(
-    join(templateDir, "slides.md"),
-    SLIDES_TEMPLATE
-  );
-  writeFileSync(
-    join(templateDir, "style.css"),
-    STYLE_TEMPLATE
-  );
-  writeFileSync(
-    join(templateDir, "package.json"),
-    DECK_PACKAGE_JSON
-  );
-  s.stop("Created decks/_template/");
+  writeFileSync(join(templateDir, "slides.md"), templates.slides);
+  writeFileSync(join(templateDir, "style.css"), templates.css);
+  writeFileSync(join(templateDir, "package.json"), DECK_PACKAGE_JSON);
+  s.stop(`Created decks/_template/ (${templateStyle})`);
 
   // 4. Create .gitignore if needed
   const gitignorePath = join(cwd, ".gitignore");
@@ -143,7 +148,7 @@ export async function init() {
       `${pc.bold("Scripts added:")}`,
       ...Object.entries(SCRIPTS).map(([k, v]) => `  ${pc.cyan(k.padEnd(8))} → ${v}`),
       "",
-      `${pc.bold("Template:")} decks/_template/`,
+      `${pc.bold("Template:")} decks/_template/ (${templateStyle})`,
     ].join("\n"),
     "Setup complete"
   );

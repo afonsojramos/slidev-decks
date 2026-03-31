@@ -18,8 +18,7 @@ import {
 import { join } from "path";
 import { findDecksDir } from "../utils/discover.js";
 import {
-  SLIDES_TEMPLATE,
-  STYLE_TEMPLATE,
+  getTemplates,
   DECK_PACKAGE_JSON,
   applyReplacements,
 } from "../utils/templates.js";
@@ -113,11 +112,13 @@ export async function newDeck(nameArg?: string) {
       }
     }
   } else {
+    // No local template — use minimal embedded template
+    const templates = getTemplates("minimal");
     writeFileSync(
       join(deckDir, "slides.md"),
-      applyReplacements(SLIDES_TEMPLATE, replacements)
+      applyReplacements(templates.slides, replacements)
     );
-    writeFileSync(join(deckDir, "style.css"), STYLE_TEMPLATE);
+    writeFileSync(join(deckDir, "style.css"), templates.css);
     writeFileSync(
       join(deckDir, "package.json"),
       applyReplacements(DECK_PACKAGE_JSON, replacements)
