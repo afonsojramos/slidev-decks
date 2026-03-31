@@ -3,11 +3,13 @@ import pc from "picocolors";
 import { discoverDecks, fuzzyMatch } from "../utils/discover.js";
 import { resolveDeck } from "../utils/picker.js";
 import { runSlidev } from "../utils/runner.js";
+import { generateIndexHtml } from "./index.js";
 import { join } from "path";
+import { mkdirSync, writeFileSync } from "fs";
 
 export async function build(
   query?: string,
-  options: { base?: string; out?: string; all?: boolean; passthrough?: string[] } = {}
+  options: { base?: string; out?: string; all?: boolean; passthrough?: string[] } = {},
 ) {
   const cwd = process.cwd();
   const decks = discoverDecks(cwd);
@@ -30,13 +32,7 @@ export async function build(
         ? `${options.base.replace(/\/$/, "")}/${deck.name}/`
         : `/${deck.name}/`;
 
-      const code = await runSlidev(deck.path, "build", [
-        "--base",
-        base,
-        "--out",
-        outDir,
-        ...extra,
-      ]);
+      const code = await runSlidev(deck.path, "build", ["--base", base, "--out", outDir, ...extra]);
 
       if (code !== 0) {
         s.stop(pc.red(`Failed: ${deck.name}`));
@@ -46,13 +42,22 @@ export async function build(
       }
     }
 
+    // Generate index page
+    const outDir = join(cwd, "dist");
+    const base = options.base || "/";
+    mkdirSync(outDir, { recursive: true });
+    const html = generateIndexHtml(decks, base);
+    writeFileSync(join(outDir, "index.html"), html);
+    s.start("Generated index page");
+    s.stop("Generated dist/index.html");
+
     if (failed > 0) {
       outro(pc.yellow(`Done with ${failed} failure${failed > 1 ? "s" : ""}`));
       process.exit(1);
     }
 
     outro(
-      `Built ${pc.bold(String(decks.length))} deck${decks.length > 1 ? "s" : ""} → dist/`
+      `Built ${pc.bold(String(decks.length))} deck${decks.length > 1 ? "s" : ""} + index → dist/`,
     );
     process.exit(0);
   }
@@ -60,7 +65,10 @@ export async function build(
   const matches = query ? fuzzyMatch(decks, query) : [];
   const deck = await resolveDeck(decks, matches, query);
 
-  if (!deck) { process.exit(0); return; }
+  if (!deck) {
+    process.exit(0);
+    return;
+  }
 
   outro(`Building ${pc.bold(deck.name)}`);
 

@@ -1,12 +1,12 @@
-import { intro, outro, spinner } from "@clack/prompts";
+import { intro, outro } from "@clack/prompts";
 import pc from "picocolors";
 import { discoverDecks } from "../utils/discover.js";
-import { mkdirSync, writeFileSync, existsSync } from "fs";
+import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
-function generateIndexHtml(
+export function generateIndexHtml(
   decks: { name: string; title: string; date?: string; author?: string }[],
-  base: string
+  base: string,
 ): string {
   const rows = decks
     .map((d) => {
@@ -105,5 +105,7 @@ export async function index(options: { base?: string; out?: string } = {}) {
   const outPath = join(outDir, "index.html");
   writeFileSync(outPath, html);
 
-  outro(`Generated ${pc.bold("dist/index.html")} with ${decks.length} deck${decks.length > 1 ? "s" : ""}`);
+  outro(
+    `Generated ${pc.bold("dist/index.html")} with ${decks.length} deck${decks.length > 1 ? "s" : ""}`,
+  );
 }
