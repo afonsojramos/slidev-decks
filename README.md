@@ -56,6 +56,25 @@ No config needed. The CLI scans for directories containing `slides.md` in:
 
 Whichever exists first is used. Folders prefixed with `_template` are excluded from the picker.
 
+### Full Slidev CLI Pass-Through
+
+Any flags `slidev-decks` doesn't recognize are forwarded directly to Slidev. You get the full power of the Slidev CLI without us having to mirror every option.
+
+```bash
+sd export ai --dark --with-clicks --range 1,4-5
+sd build ai --download
+sd dev ai --remote
+```
+
+Running `--help` on `dev`, `build`, or `export` shows Slidev's own help with all available options:
+
+```bash
+sd export --help    # shows Slidev's export options (format, dark, timeout, range, etc.)
+sd build --help     # shows Slidev's build options (download, base, etc.)
+sd dev --help       # shows Slidev's dev options (remote, port, etc.)
+sd --help           # shows slidev-decks commands
+```
+
 ### Package Manager Detection
 
 Automatically detects and uses your package manager (bun, pnpm, npm, yarn) based on the lockfile present in your repo.
