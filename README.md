@@ -49,6 +49,7 @@ slidev-decks -y             # starts the most recent deck (sorted by date)
 ### Auto-Discovery
 
 No config needed. The CLI scans for directories containing `slides.md` in:
+
 - `decks/`
 - `talks/`
 - `presentations/`
@@ -95,6 +96,7 @@ decks/
 ```
 
 When creating a new deck:
+
 - **1 template** found: uses it automatically
 - **Multiple templates**: shows a picker to choose
 - **No templates**: falls back to a built-in minimal template
@@ -103,14 +105,14 @@ When creating a new deck:
 
 Templates support `{{PLACEHOLDER}}` syntax that gets replaced during deck creation:
 
-| Placeholder | Replaced with |
-|-------------|---------------|
-| `{{TITLE}}` | Presentation title |
-| `{{SUBTITLE}}` | Subtitle |
-| `{{DESCRIPTION}}` | Info/description metadata |
-| `{{AUTHOR}}` | Author name (defaults from `package.json` `author` field) |
-| `{{YEAR}}` | Current year |
-| `{{NAME}}` | Deck folder name |
+| Placeholder       | Replaced with                                             |
+| ----------------- | --------------------------------------------------------- |
+| `{{TITLE}}`       | Presentation title                                        |
+| `{{SUBTITLE}}`    | Subtitle                                                  |
+| `{{DESCRIPTION}}` | Info/description metadata                                 |
+| `{{AUTHOR}}`      | Author name (defaults from `package.json` `author` field) |
+| `{{YEAR}}`        | Current year                                              |
+| `{{NAME}}`        | Deck folder name                                          |
 
 Placeholders are replaced in `slides.md`, `package.json`, and `style.css`.
 
@@ -201,6 +203,7 @@ npx slidev-decks init
 ```
 
 What it does:
+
 - Detects your package manager
 - Installs `slidev-decks` as a devDependency
 - Adds `dev`, `build`, `export`, `new`, and `list` scripts to `package.json`
@@ -240,6 +243,59 @@ sd list         # list decks
 sd new          # create deck
 sd build ai     # build
 ```
+
+## GitHub Action
+
+A reusable composite action is included for building and deploying all decks in CI.
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy Presentations
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build all decks
+        uses: afonsojramos/slidev-decks/action@main
+        with:
+          base: "/"
+          install-command: "npm ci"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+```
+
+The action builds every deck into `dist/<deck-name>/`, generates an `index.html`, and outputs the `dist` path for deployment.
+
+**Inputs:**
+
+| Input             | Default    | Description                         |
+| ----------------- | ---------- | ----------------------------------- |
+| `base`            | `/`        | Base path for deployment            |
+| `install-command` | `npm ci`   | Command to install dependencies     |
 
 ## Prior Art
 
