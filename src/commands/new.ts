@@ -32,6 +32,14 @@ export async function newDeck(nameArg?: string) {
 
   const decksDir = findDecksDir(cwd) || join(cwd, "decks");
 
+  // Read author from root package.json
+  let pkgAuthor = "";
+  try {
+    const pkg = JSON.parse(readFileSync(join(cwd, "package.json"), "utf-8"));
+    if (typeof pkg.author === "string") pkgAuthor = pkg.author;
+    else if (pkg.author?.name) pkgAuthor = pkg.author.name;
+  } catch {}
+
   const now = new Date();
   const datePrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
@@ -66,7 +74,8 @@ export async function newDeck(nameArg?: string) {
 
   const author = await text({
     message: "Author",
-    placeholder: "Your Name",
+    defaultValue: pkgAuthor || undefined,
+    placeholder: pkgAuthor || "Your Name",
   });
   if (isCancel(author)) { cancel("Cancelled"); process.exit(0); }
 
