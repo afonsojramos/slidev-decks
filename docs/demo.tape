@@ -1,4 +1,4 @@
-Output demo.gif
+Output docs/demo.gif
 
 Set Shell "bash"
 Set FontSize 15
@@ -9,10 +9,26 @@ Set Padding 20
 Set TypingSpeed 40ms
 Set CursorBlink false
 
+# Set up a clean demo environment
 Hide
-Type "cd /tmp/demo-talks"
+Type `rm -rf /tmp/demo-talks`
 Enter
 Sleep 300ms
+Type `mkdir -p /tmp/demo-talks/decks/2026-03-ai-and-work /tmp/demo-talks/decks/2026-04-react-deep-dive /tmp/demo-talks/decks/_template`
+Enter
+Sleep 300ms
+Type `echo '---\ntitle: The Role of AI in Peoples Lives\n---\n# The Role of AI' > /tmp/demo-talks/decks/2026-03-ai-and-work/slides.md`
+Enter
+Sleep 300ms
+Type `echo '---\ntitle: React Server Components Deep Dive\nauthor: Afonso Ramos\n---\n# React Deep Dive' > /tmp/demo-talks/decks/2026-04-react-deep-dive/slides.md`
+Enter
+Sleep 300ms
+Type `echo '---\ntitle: "{{TITLE}}"\n---\n# {{TITLE}}' > /tmp/demo-talks/decks/_template/slides.md`
+Enter
+Sleep 300ms
+Type `cd /tmp/demo-talks && npm init -y > /dev/null 2>&1 && npm install --silent @slidev/cli @slidev/theme-default > /dev/null 2>&1`
+Enter
+Sleep 15s
 Type "clear"
 Enter
 Sleep 300ms
