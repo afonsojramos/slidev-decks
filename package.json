@@ -29,15 +29,15 @@
     "url": "https://github.com/afonsojramos/slidev-decks"
   },
   "dependencies": {
-    "@clack/prompts": "^1.1.0",
-    "cac": "^6.7.14",
+    "@clack/prompts": "^1.2.0",
+    "cac": "^7.0.0",
     "fast-glob": "^3.3.3",
     "gray-matter": "^4.0.3",
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
-    "tsup": "^8.4.0",
-    "typescript": "^5.8.0"
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.2"
   }
 }
