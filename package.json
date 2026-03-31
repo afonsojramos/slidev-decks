@@ -2,31 +2,38 @@
   "name": "slidev-decks",
   "version": "0.1.0",
   "description": "CLI companion for managing multiple Slidev presentations",
-  "type": "module",
-  "bin": {
-    "slidev-decks": "./dist/cli.js",
-    "sd": "./dist/cli.js"
-  },
-  "files": ["dist"],
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
-  },
   "keywords": [
-    "slidev",
-    "presentation",
-    "slides",
     "cli",
     "multi-deck",
+    "presentation",
+    "slides",
+    "slidev",
     "talks"
   ],
-  "author": "Afonso Ramos",
   "license": "MIT",
+  "author": "Afonso Ramos",
   "repository": {
     "type": "git",
     "url": "https://github.com/afonsojramos/slidev-decks"
+  },
+  "bin": {
+    "sd": "./dist/cli.js",
+    "slidev-decks": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt .",
+    "fmt:check": "oxfmt --check .",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@clack/prompts": "^1.2.0",
@@ -37,7 +44,12 @@
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
+    "oxfmt": "^0.43.0",
+    "oxlint": "^1.58.0",
     "tsup": "^8.5.1",
     "typescript": "^6.0.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
