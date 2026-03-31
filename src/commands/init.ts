@@ -16,20 +16,20 @@ const SCRIPTS = {
 
 const GITIGNORE_ENTRIES = ["node_modules", "dist", ".slidev", "*.local", ".DS_Store"];
 
-function runInstall(pm: string, pkg: string, cwd: string): Promise<number> {
+function runInstall(pm: string, packages: string[], cwd: string): Promise<number> {
   const args: string[] = [];
   switch (pm) {
     case "bun":
-      args.push("add", "-d", pkg);
+      args.push("add", "-d", ...packages);
       break;
     case "pnpm":
-      args.push("add", "-D", pkg);
+      args.push("add", "-D", ...packages);
       break;
     case "yarn":
-      args.push("add", "-D", pkg);
+      args.push("add", "-D", ...packages);
       break;
     case "npm":
-      args.push("install", "-D", pkg);
+      args.push("install", "-D", ...packages);
       break;
   }
 
@@ -78,14 +78,17 @@ export async function init() {
   const pm = detectPackageManager(cwd);
   const s = spinner();
 
-  // 1. Install slidev-decks
-  s.start(`Installing slidev-decks with ${pm}`);
-  const installCode = await runInstall(pm, "slidev-decks", cwd);
+  // 1. Install slidev-decks + @slidev/cli + theme
+  const theme = style === "styled" ? "@slidev/theme-seriph" : "@slidev/theme-default";
+  const packages = ["slidev-decks", "@slidev/cli", theme];
+
+  s.start(`Installing ${packages.join(", ")} with ${pm}`);
+  const installCode = await runInstall(pm, packages, cwd);
   if (installCode !== 0) {
     s.stop(pc.yellow("Could not install automatically. Run manually:"));
-    console.log(`  ${pm} ${pm === "npm" ? "install -D" : "add -D"} slidev-decks\n`);
+    console.log(`  ${pm} ${pm === "npm" ? "install -D" : "add -D"} ${packages.join(" ")}\n`);
   } else {
-    s.stop(`Installed with ${pm}`);
+    s.stop(`Installed ${packages.length} packages with ${pm}`);
   }
 
   // 2. Add scripts to package.json
