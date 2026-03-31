@@ -56,6 +56,20 @@ cli
     list();
   });
 
+cli
+  .command("init", "Set up a multi-deck repo with scripts and template")
+  .action(async () => {
+    const { init } = await import("./commands/init.js");
+    await init();
+  });
+
+cli
+  .command("new [name]", "Create a new presentation deck")
+  .action(async (name?: string) => {
+    const { newDeck } = await import("./commands/new.js");
+    await newDeck(name);
+  });
+
 cli.help();
 cli.version(version);
 
