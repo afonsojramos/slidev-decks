@@ -90,7 +90,7 @@ export async function newDeck(nameArg?: string) {
 
   const deckDir = join(decksDir, name);
   mkdirSync(deckDir, { recursive: true });
-  mkdirSync(join(deckDir, "public", "logos"), { recursive: true });
+  mkdirSync(join(deckDir, "public"), { recursive: true });
 
   const replacements = {
     TITLE: title as string,
