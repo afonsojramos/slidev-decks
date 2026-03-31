@@ -26,11 +26,13 @@ cli
 
 cli
   .command("build [query]", "Build a deck for production")
+  .option("-a, --all", "Build all decks into dist/<name>/")
   .option("--base <path>", "Base path for deployment")
   .option("-o, --out <dir>", "Output directory")
   .action(async (query?: string, options?: Record<string, unknown>) => {
     const { build } = await import("./commands/build.js");
     await build(query, {
+      all: options?.all as boolean,
       base: options?.base as string,
       out: options?.out as string,
     });
@@ -54,6 +56,19 @@ cli
   .action(async () => {
     const { list } = await import("./commands/list.js");
     list();
+  });
+
+cli
+  .command("index", "Generate an index page linking to all built decks")
+  .alias("idx")
+  .option("--base <path>", "Base path for links")
+  .option("-o, --out <dir>", "Output directory (default: dist/)")
+  .action(async (_: unknown, options?: Record<string, unknown>) => {
+    const { index } = await import("./commands/index.js");
+    await index({
+      base: options?.base as string,
+      out: options?.out as string,
+    });
   });
 
 cli
