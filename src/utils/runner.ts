@@ -5,8 +5,7 @@ import { spawn } from "child_process";
 type PackageManager = "bun" | "pnpm" | "npm" | "yarn";
 
 export function detectPackageManager(cwd: string): PackageManager {
-  if (existsSync(join(cwd, "bun.lock")) || existsSync(join(cwd, "bun.lockb")))
-    return "bun";
+  if (existsSync(join(cwd, "bun.lock")) || existsSync(join(cwd, "bun.lockb"))) return "bun";
   if (existsSync(join(cwd, "pnpm-lock.yaml"))) return "pnpm";
   if (existsSync(join(cwd, "yarn.lock"))) return "yarn";
   return "npm";
@@ -25,11 +24,7 @@ function getRunnerCommand(pm: PackageManager): string {
   }
 }
 
-export function runSlidev(
-  deckPath: string,
-  command: string,
-  args: string[] = []
-): Promise<number> {
+export function runSlidev(deckPath: string, command: string, args: string[] = []): Promise<number> {
   // Walk up to find the lockfile / root
   let root = deckPath;
   for (let i = 0; i < 5; i++) {
@@ -52,7 +47,9 @@ export function runSlidev(
   const runner = getRunnerCommand(pm);
   const [cmd, ...runnerArgs] = runner.split(" ");
 
-  const fullArgs = [...runnerArgs, "slidev", ...(command ? [command] : []), ...args].filter(Boolean);
+  const fullArgs = [...runnerArgs, "slidev", ...(command ? [command] : []), ...args].filter(
+    Boolean,
+  );
 
   return new Promise((resolve) => {
     const child = spawn(cmd, fullArgs, {

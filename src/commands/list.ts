@@ -14,9 +14,7 @@ export function list() {
 
   const nameWidth = Math.max(...decks.map((d) => d.name.length), 4);
 
-  console.log(
-    `  ${pc.dim("Name".padEnd(nameWidth))}  ${pc.dim("Title")}`
-  );
+  console.log(`  ${pc.dim("Name".padEnd(nameWidth))}  ${pc.dim("Title")}`);
   console.log(`  ${pc.dim("─".repeat(nameWidth))}  ${pc.dim("─".repeat(40))}`);
 
   for (const deck of decks) {

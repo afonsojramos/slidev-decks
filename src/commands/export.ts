@@ -4,7 +4,10 @@ import { discoverDecks, fuzzyMatch } from "../utils/discover.js";
 import { resolveDeck } from "../utils/picker.js";
 import { runSlidev } from "../utils/runner.js";
 
-export async function exportDeck(query?: string, options: { format?: string; output?: string; passthrough?: string[] } = {}) {
+export async function exportDeck(
+  query?: string,
+  options: { format?: string; output?: string; passthrough?: string[] } = {},
+) {
   const cwd = process.cwd();
   const decks = discoverDecks(cwd);
   const extra = options.passthrough || [];
@@ -17,7 +20,10 @@ export async function exportDeck(query?: string, options: { format?: string; out
   const matches = query ? fuzzyMatch(decks, query) : [];
   const deck = await resolveDeck(decks, matches, query);
 
-  if (!deck) { process.exit(0); return; }
+  if (!deck) {
+    process.exit(0);
+    return;
+  }
 
   outro(`Exporting ${pc.bold(deck.name)}`);
 

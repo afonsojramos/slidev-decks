@@ -348,10 +348,7 @@ export function getTemplates(style: TemplateStyle) {
   };
 }
 
-export function applyReplacements(
-  template: string,
-  replacements: Record<string, string>
-): string {
+export function applyReplacements(template: string, replacements: Record<string, string>): string {
   let result = template;
   for (const [key, value] of Object.entries(replacements)) {
     result = result.replaceAll(`{{${key}}}`, value);

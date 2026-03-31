@@ -1,12 +1,4 @@
-import {
-  intro,
-  outro,
-  spinner,
-  select,
-  cancel,
-  isCancel,
-  note,
-} from "@clack/prompts";
+import { intro, outro, spinner, select, cancel, isCancel, note } from "@clack/prompts";
 import pc from "picocolors";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -22,13 +14,7 @@ const SCRIPTS = {
   list: "slidev-decks list",
 };
 
-const GITIGNORE_ENTRIES = [
-  "node_modules",
-  "dist",
-  ".slidev",
-  "*.local",
-  ".DS_Store",
-];
+const GITIGNORE_ENTRIES = ["node_modules", "dist", ".slidev", "*.local", ".DS_Store"];
 
 function runInstall(pm: string, pkg: string, cwd: string): Promise<number> {
   const args: string[] = [];
@@ -62,10 +48,7 @@ export async function init() {
   // Check if package.json exists
   const pkgPath = join(cwd, "package.json");
   if (!existsSync(pkgPath)) {
-    note(
-      "No package.json found. Creating one.",
-      "New project"
-    );
+    note("No package.json found. Creating one.", "New project");
     writeFileSync(pkgPath, JSON.stringify({ name: "my-talks", private: true }, null, 2) + "\n");
   }
 
@@ -85,7 +68,11 @@ export async function init() {
       },
     ],
   });
-  if (isCancel(templateStyle)) { cancel("Cancelled"); process.exit(0); return; }
+  if (isCancel(templateStyle)) {
+    cancel("Cancelled");
+    process.exit(0);
+    return;
+  }
 
   const style = templateStyle as TemplateStyle;
   const pm = detectPackageManager(cwd);
@@ -139,7 +126,7 @@ export async function init() {
     if (missing.length > 0) {
       writeFileSync(
         gitignorePath,
-        existing.trimEnd() + "\n\n# slidev-decks\n" + missing.join("\n") + "\n"
+        existing.trimEnd() + "\n\n# slidev-decks\n" + missing.join("\n") + "\n",
       );
     }
   }
@@ -151,7 +138,7 @@ export async function init() {
       "",
       `${pc.bold("Template:")} decks/_template/ (${style})`,
     ].join("\n"),
-    "Setup complete"
+    "Setup complete",
   );
 
   outro(`Run ${pc.cyan(`${pm === "npm" ? "npm run" : pm} new`)} to create your first presentation`);

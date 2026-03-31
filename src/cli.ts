@@ -12,9 +12,7 @@ const version = pkg.version as string;
 const args = process.argv.slice(2);
 const slidevCommands = ["dev", "build", "export"];
 const isHelpForSlidev =
-  args.includes("--help") &&
-  args.length >= 2 &&
-  slidevCommands.includes(args[0]);
+  args.includes("--help") && args.length >= 2 && slidevCommands.includes(args[0]);
 
 if (isHelpForSlidev) {
   const cmd = args[0] === "dev" ? "" : args[0];
@@ -93,19 +91,15 @@ cli
     });
   });
 
-cli
-  .command("init", "Set up a multi-deck repo with scripts and template")
-  .action(async () => {
-    const { init } = await import("./commands/init.js");
-    await init();
-  });
+cli.command("init", "Set up a multi-deck repo with scripts and template").action(async () => {
+  const { init } = await import("./commands/init.js");
+  await init();
+});
 
-cli
-  .command("new [name]", "Create a new presentation deck")
-  .action(async (name?: string) => {
-    const { newDeck } = await import("./commands/new.js");
-    await newDeck(name);
-  });
+cli.command("new [name]", "Create a new presentation deck").action(async (name?: string) => {
+  const { newDeck } = await import("./commands/new.js");
+  await newDeck(name);
+});
 
 cli.help();
 cli.version(version);

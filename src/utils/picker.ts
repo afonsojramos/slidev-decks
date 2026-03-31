@@ -4,7 +4,7 @@ import type { Deck } from "./discover.js";
 
 export async function pickDeck(
   decks: Deck[],
-  message: string = "Which deck?"
+  message: string = "Which deck?",
 ): Promise<Deck | null> {
   const selected = await select({
     message,
@@ -26,11 +26,13 @@ export async function pickDeck(
 export async function resolveDeck(
   decks: Deck[],
   matches: Deck[],
-  query?: string
+  query?: string,
 ): Promise<Deck | null> {
   if (matches.length === 1) {
     const deck = matches[0];
-    console.log(`  ${pc.green("✓")} Matched: ${pc.bold(deck.name)}${deck.title !== deck.name ? pc.dim(` — ${deck.title}`) : ""}\n`);
+    console.log(
+      `  ${pc.green("✓")} Matched: ${pc.bold(deck.name)}${deck.title !== deck.name ? pc.dim(` — ${deck.title}`) : ""}\n`,
+    );
     return deck;
   }
 

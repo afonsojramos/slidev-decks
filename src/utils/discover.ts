@@ -60,7 +60,7 @@ export function discoverDecks(cwd: string): Deck[] {
 
       return { name, path: deckDir, entry: fullPath, title, date, author };
     })
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       // Sort by date descending (most recent first), then name
       if (a.date && b.date) return b.date.localeCompare(a.date);
       if (a.date) return -1;
@@ -71,9 +71,5 @@ export function discoverDecks(cwd: string): Deck[] {
 
 export function fuzzyMatch(decks: Deck[], query: string): Deck[] {
   const q = query.toLowerCase();
-  return decks.filter(
-    (d) =>
-      d.name.toLowerCase().includes(q) ||
-      d.title.toLowerCase().includes(q)
-  );
+  return decks.filter((d) => d.name.toLowerCase().includes(q) || d.title.toLowerCase().includes(q));
 }
