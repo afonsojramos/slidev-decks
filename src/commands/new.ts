@@ -25,22 +25,12 @@ import {
 } from "../utils/templates.js";
 import { runSlidev } from "../utils/runner.js";
 
-function getDefaultAuthor(cwd: string): string {
-  try {
-    const pkg = JSON.parse(readFileSync(join(cwd, "package.json"), "utf-8"));
-    return pkg["slidev-decks"]?.author || "";
-  } catch {
-    return "";
-  }
-}
-
 export async function newDeck(nameArg?: string) {
   const cwd = process.cwd();
 
   intro("New Presentation");
 
   const decksDir = findDecksDir(cwd) || join(cwd, "decks");
-  const defaultAuthor = getDefaultAuthor(cwd);
 
   const now = new Date();
   const datePrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -50,7 +40,7 @@ export async function newDeck(nameArg?: string) {
       message: "Deck name (kebab-case)",
       placeholder: `${datePrefix}-my-talk`,
       validate: (value) => {
-        if (!value.trim()) return "Name is required";
+        if (!value?.trim()) return "Name is required";
         if (!/^[a-z0-9-]+$/.test(value))
           return "Use lowercase letters, numbers, and hyphens only";
         if (existsSync(join(decksDir, value)))
@@ -64,7 +54,7 @@ export async function newDeck(nameArg?: string) {
   const title = await text({
     message: "Presentation title",
     placeholder: "My Awesome Talk",
-    validate: (v) => { if (!v.trim()) return "Title is required"; },
+    validate: (v) => { if (!v?.trim()) return "Title is required"; },
   });
   if (isCancel(title)) { cancel("Cancelled"); process.exit(0); }
 
@@ -76,8 +66,7 @@ export async function newDeck(nameArg?: string) {
 
   const author = await text({
     message: "Author",
-    defaultValue: defaultAuthor,
-    placeholder: defaultAuthor || "Your Name",
+    placeholder: "Your Name",
   });
   if (isCancel(author)) { cancel("Cancelled"); process.exit(0); }
 
@@ -97,7 +86,7 @@ export async function newDeck(nameArg?: string) {
     TITLE: title as string,
     SUBTITLE: (subtitle as string) || "",
     DESCRIPTION: "",
-    AUTHOR: (author as string) || defaultAuthor || "",
+    AUTHOR: (author as string) || "",
     YEAR: now.getFullYear().toString(),
     NAME: name,
   };

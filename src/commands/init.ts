@@ -2,9 +2,6 @@ import {
   intro,
   outro,
   spinner,
-  text,
-  cancel,
-  isCancel,
   note,
 } from "@clack/prompts";
 import pc from "picocolors";
@@ -68,16 +65,6 @@ export async function init() {
     );
     writeFileSync(pkgPath, JSON.stringify({ name: "my-talks", private: true }, null, 2) + "\n");
   }
-
-  // Ask for default author
-  const author = await text({
-    message: "Default author name for new presentations",
-    placeholder: "Your Name",
-    validate: (v) => {
-      if (!v.trim()) return "Author is required";
-    },
-  });
-  if (isCancel(author)) { cancel("Cancelled"); process.exit(0); }
 
   const pm = detectPackageManager(cwd);
   const s = spinner();
@@ -151,17 +138,12 @@ export async function init() {
     }
   }
 
-  // 5. Store default author in package.json
-  pkg["slidev-decks"] = { author: author as string };
-  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-
   note(
     [
       `${pc.bold("Scripts added:")}`,
       ...Object.entries(SCRIPTS).map(([k, v]) => `  ${pc.cyan(k.padEnd(8))} → ${v}`),
       "",
       `${pc.bold("Template:")} decks/_template/`,
-      `${pc.bold("Author:")} ${author}`,
     ].join("\n"),
     "Setup complete"
   );
