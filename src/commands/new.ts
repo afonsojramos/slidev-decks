@@ -105,7 +105,7 @@ export async function newDeck(nameArg?: string) {
   if (existsSync(join(localTemplate, "slides.md"))) {
     cpSync(localTemplate, deckDir, { recursive: true });
     // Replace placeholders in copied files
-    for (const file of ["slides.md", "package.json"]) {
+    for (const file of ["slides.md", "package.json", "style.css"]) {
       const filePath = join(deckDir, file);
       if (existsSync(filePath)) {
         const content = readFileSync(filePath, "utf-8");
