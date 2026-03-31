@@ -16,10 +16,21 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm install
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Format check
+        run: bun run fmt:check
 
       - name: Typecheck
-        run: npm run typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun test
 
       - name: Build
-        run: npm run build
+        run: bun run build
