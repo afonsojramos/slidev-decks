@@ -1,0 +1,138 @@
+import {
+  intro,
+  text,
+  confirm,
+  cancel,
+  outro,
+  isCancel,
+  spinner,
+} from "@clack/prompts";
+import pc from "picocolors";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  cpSync,
+} from "fs";
+import { join } from "path";
+import { findDecksDir } from "../utils/discover.js";
+import {
+  SLIDES_TEMPLATE,
+  STYLE_TEMPLATE,
+  DECK_PACKAGE_JSON,
+  applyReplacements,
+} from "../utils/templates.js";
+import { runSlidev } from "../utils/runner.js";
+
+function getDefaultAuthor(cwd: string): string {
+  try {
+    const pkg = JSON.parse(readFileSync(join(cwd, "package.json"), "utf-8"));
+    return pkg["slidev-decks"]?.author || "";
+  } catch {
+    return "";
+  }
+}
+
+export async function newDeck(nameArg?: string) {
+  const cwd = process.cwd();
+
+  intro("New Presentation");
+
+  const decksDir = findDecksDir(cwd) || join(cwd, "decks");
+  const defaultAuthor = getDefaultAuthor(cwd);
+
+  const now = new Date();
+  const datePrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  const name = nameArg || await (async () => {
+    const result = await text({
+      message: "Deck name (kebab-case)",
+      placeholder: `${datePrefix}-my-talk`,
+      validate: (value) => {
+        if (!value.trim()) return "Name is required";
+        if (!/^[a-z0-9-]+$/.test(value))
+          return "Use lowercase letters, numbers, and hyphens only";
+        if (existsSync(join(decksDir, value)))
+          return `${value} already exists`;
+      },
+    });
+    if (isCancel(result)) { cancel("Cancelled"); process.exit(0); }
+    return result as string;
+  })();
+
+  const title = await text({
+    message: "Presentation title",
+    placeholder: "My Awesome Talk",
+    validate: (v) => { if (!v.trim()) return "Title is required"; },
+  });
+  if (isCancel(title)) { cancel("Cancelled"); process.exit(0); }
+
+  const subtitle = await text({
+    message: "Subtitle (optional)",
+    placeholder: "A deep dive into...",
+  });
+  if (isCancel(subtitle)) { cancel("Cancelled"); process.exit(0); }
+
+  const author = await text({
+    message: "Author",
+    defaultValue: defaultAuthor,
+    placeholder: defaultAuthor || "Your Name",
+  });
+  if (isCancel(author)) { cancel("Cancelled"); process.exit(0); }
+
+  const shouldStart = await confirm({
+    message: "Start dev server after creating?",
+  });
+  if (isCancel(shouldStart)) { cancel("Cancelled"); process.exit(0); }
+
+  const s = spinner();
+  s.start("Creating deck");
+
+  const deckDir = join(decksDir, name);
+  mkdirSync(deckDir, { recursive: true });
+  mkdirSync(join(deckDir, "public", "logos"), { recursive: true });
+
+  const replacements = {
+    TITLE: title as string,
+    SUBTITLE: (subtitle as string) || "",
+    DESCRIPTION: "",
+    AUTHOR: (author as string) || defaultAuthor || "",
+    YEAR: now.getFullYear().toString(),
+    NAME: name,
+  };
+
+  // Check for local template first, fall back to embedded
+  const localTemplate = join(decksDir, "_template");
+  if (existsSync(join(localTemplate, "slides.md"))) {
+    cpSync(localTemplate, deckDir, { recursive: true });
+    // Replace placeholders in copied files
+    for (const file of ["slides.md", "package.json"]) {
+      const filePath = join(deckDir, file);
+      if (existsSync(filePath)) {
+        const content = readFileSync(filePath, "utf-8");
+        writeFileSync(filePath, applyReplacements(content, replacements));
+      }
+    }
+  } else {
+    writeFileSync(
+      join(deckDir, "slides.md"),
+      applyReplacements(SLIDES_TEMPLATE, replacements)
+    );
+    writeFileSync(join(deckDir, "style.css"), STYLE_TEMPLATE);
+    writeFileSync(
+      join(deckDir, "package.json"),
+      applyReplacements(DECK_PACKAGE_JSON, replacements)
+    );
+  }
+
+  s.stop(`Created ${pc.bold(`decks/${name}`)}`);
+
+  if (shouldStart) {
+    outro(`Starting dev server for ${pc.bold(name)}`);
+    const code = await runSlidev(deckDir, "");
+    process.exit(code);
+  } else {
+    outro(`Run ${pc.cyan(`slidev-decks ${name}`)} to start the dev server`);
+  }
+}
