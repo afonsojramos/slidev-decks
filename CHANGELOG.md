@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/afonsojramos/slidev-decks/compare/v0.2.0...v0.3.0) (2026-03-31)
+
+
+### Features
+
+* install @slidev/cli and theme alongside slidev-decks in init ([1aa2514](https://github.com/afonsojramos/slidev-decks/commit/1aa25144018939fa0842e2902b2f7ebc35a4d559))
+
+
+### Bug Fixes
+
+* exclude CHANGELOG.md from oxfmt format checks ([18a5492](https://github.com/afonsojramos/slidev-decks/commit/18a54920ec030d7dfaf4f8d99b3199f8e9668a15))
+
 ## [0.2.0](https://github.com/afonsojramos/slidev-decks/compare/v0.1.0...v0.2.0) (2026-03-31)
 
 
