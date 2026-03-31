@@ -1,0 +1,42 @@
+{
+  "name": "slidev-decks",
+  "version": "0.1.0",
+  "description": "CLI companion for managing multiple Slidev presentations",
+  "type": "module",
+  "bin": {
+    "slidev-decks": "./dist/cli.js",
+    "sd": "./dist/cli.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "slidev",
+    "presentation",
+    "slides",
+    "cli",
+    "multi-deck",
+    "talks"
+  ],
+  "author": "Afonso Ramos",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/afonsojramos/slidev-decks"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.1.0",
+    "cac": "^6.7.14",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.0"
+  }
+}
