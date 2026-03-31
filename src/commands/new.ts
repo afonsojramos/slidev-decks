@@ -2,6 +2,7 @@ import {
   intro,
   text,
   confirm,
+  select,
   cancel,
   outro,
   isCancel,
@@ -12,10 +13,11 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
   writeFileSync,
   cpSync,
 } from "fs";
-import { join } from "path";
+import { join, basename } from "path";
 import { findDecksDir } from "../utils/discover.js";
 import {
   getTemplates,
@@ -99,11 +101,36 @@ export async function newDeck(nameArg?: string) {
     NAME: name,
   };
 
-  // Check for local template first, fall back to embedded
-  const localTemplate = join(decksDir, "_template");
-  if (existsSync(join(localTemplate, "slides.md"))) {
-    cpSync(localTemplate, deckDir, { recursive: true });
-    // Replace placeholders in copied files
+  // Discover local templates (_template, _template-*, etc.)
+  const localTemplates = existsSync(decksDir)
+    ? readdirSync(decksDir).filter(
+        (d) =>
+          d.startsWith("_template") &&
+          existsSync(join(decksDir, d, "slides.md"))
+      )
+    : [];
+
+  let templateDir: string | null = null;
+
+  if (localTemplates.length === 1) {
+    templateDir = join(decksDir, localTemplates[0]);
+  } else if (localTemplates.length > 1) {
+    s.stop("Multiple templates found");
+    const picked = await select({
+      message: "Which template?",
+      options: localTemplates.map((t) => ({
+        value: t,
+        label: t.replace(/^_template-?/, "") || "default",
+        hint: t,
+      })),
+    });
+    if (isCancel(picked)) { cancel("Cancelled"); process.exit(0); }
+    templateDir = join(decksDir, picked as string);
+    s.start("Creating deck");
+  }
+
+  if (templateDir) {
+    cpSync(templateDir, deckDir, { recursive: true });
     for (const file of ["slides.md", "package.json", "style.css"]) {
       const filePath = join(deckDir, file);
       if (existsSync(filePath)) {
@@ -112,7 +139,6 @@ export async function newDeck(nameArg?: string) {
       }
     }
   } else {
-    // No local template — use minimal embedded template
     const templates = getTemplates("minimal");
     writeFileSync(
       join(deckDir, "slides.md"),
