@@ -2,6 +2,10 @@
 
 CLI companion for managing multiple [Slidev](https://sli.dev) presentations in a single repository.
 
+<p align="center">
+  <img src="demo.gif" alt="slidev-decks demo" width="700" />
+</p>
+
 ## Quick Start
 
 ```bash
