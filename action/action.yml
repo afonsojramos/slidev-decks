@@ -1,0 +1,53 @@
+name: "Build Slidev Decks"
+description: "Build all Slidev presentations and generate an index page"
+branding:
+  icon: "monitor"
+  color: "blue"
+
+inputs:
+  base:
+    description: "Base path for deployment (e.g., /talks/)"
+    required: false
+    default: "/"
+  install-command:
+    description: "Command to install dependencies"
+    required: false
+    default: "npm ci"
+
+outputs:
+  dist-path:
+    description: "Path to the built output"
+    value: ${{ steps.build.outputs.dist-path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Install dependencies
+      shell: bash
+      run: ${{ inputs.install-command }}
+
+    - name: Install slidev-decks
+      shell: bash
+      run: npm install -g slidev-decks
+
+    - name: Install Playwright for PDF export
+      shell: bash
+      run: npx playwright install chromium
+      continue-on-error: true
+
+    - name: Build all decks
+      id: build
+      shell: bash
+      run: |
+        slidev-decks build --all --base "${{ inputs.base }}"
+        slidev-decks index --base "${{ inputs.base }}"
+        echo "dist-path=dist" >> $GITHUB_OUTPUT
+
+    - name: List built decks
+      shell: bash
+      run: ls -la dist/
