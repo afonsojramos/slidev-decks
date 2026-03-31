@@ -1,0 +1,3 @@
+oxlint
+oxfmt --check .
+bun test
