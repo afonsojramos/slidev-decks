@@ -292,10 +292,10 @@ The action builds every deck into `dist/<deck-name>/`, generates an `index.html`
 
 **Inputs:**
 
-| Input             | Default    | Description                         |
-| ----------------- | ---------- | ----------------------------------- |
-| `base`            | `/`        | Base path for deployment            |
-| `install-command` | `npm ci`   | Command to install dependencies     |
+| Input             | Default  | Description                     |
+| ----------------- | -------- | ------------------------------- |
+| `base`            | `/`      | Base path for deployment        |
+| `install-command` | `npm ci` | Command to install dependencies |
 
 ## Prior Art
 
