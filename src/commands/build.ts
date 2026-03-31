@@ -7,10 +7,11 @@ import { join } from "path";
 
 export async function build(
   query?: string,
-  options: { base?: string; out?: string; all?: boolean } = {}
+  options: { base?: string; out?: string; all?: boolean; passthrough?: string[] } = {}
 ) {
   const cwd = process.cwd();
   const decks = discoverDecks(cwd);
+  const extra = options.passthrough || [];
 
   if (decks.length === 0) {
     console.error(pc.red("No decks found."));
@@ -34,6 +35,7 @@ export async function build(
         base,
         "--out",
         outDir,
+        ...extra,
       ]);
 
       if (code !== 0) {
@@ -65,6 +67,7 @@ export async function build(
   const args: string[] = [];
   if (options.base) args.push("--base", options.base);
   if (options.out) args.push("--out", options.out);
+  args.push(...extra);
 
   const code = await runSlidev(deck.path, "build", args);
   process.exit(code);
