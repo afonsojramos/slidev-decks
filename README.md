@@ -1,5 +1,11 @@
 # slidev-decks
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/slidev-decks"><img src="https://img.shields.io/npm/v/slidev-decks" alt="npm version" /></a>
+  <a href="https://github.com/afonsojramos/slidev-decks/actions/workflows/ci.yml"><img src="https://github.com/afonsojramos/slidev-decks/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/afonsojramos/slidev-decks/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/slidev-decks" alt="license" /></a>
+</p>
+
 CLI companion for managing multiple [Slidev](https://sli.dev) presentations in a single repository.
 
 <p align="center">
