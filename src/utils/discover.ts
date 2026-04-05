@@ -1,6 +1,5 @@
-import fg from "fast-glob";
 import matter from "gray-matter";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, readdirSync, existsSync } from "fs";
 import { join, basename, dirname } from "path";
 
 export interface Deck {
@@ -14,14 +13,20 @@ export interface Deck {
 
 const DEFAULT_DECKS_DIRS = ["decks", "talks", "presentations", "."];
 const ENTRY_FILE = "slides.md";
+const IGNORED_DIRS = new Set(["_template", "node_modules"]);
+
+function findEntryFiles(base: string): string[] {
+  if (!existsSync(base)) return [];
+  return readdirSync(base, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && !IGNORED_DIRS.has(d.name))
+    .map((d) => join(d.name, ENTRY_FILE))
+    .filter((rel) => existsSync(join(base, rel)));
+}
 
 export function findDecksDir(cwd: string): string | null {
   for (const dir of DEFAULT_DECKS_DIRS) {
     const full = dir === "." ? cwd : join(cwd, dir);
-    if (existsSync(full)) {
-      const entries = fg.sync(`*/${ENTRY_FILE}`, { cwd: full, onlyFiles: true });
-      if (entries.length > 0) return full;
-    }
+    if (findEntryFiles(full).length > 0) return full;
   }
   return null;
 }
@@ -30,11 +35,7 @@ export function discoverDecks(cwd: string): Deck[] {
   const decksDir = findDecksDir(cwd);
   if (!decksDir) return [];
 
-  const entries = fg.sync(`*/${ENTRY_FILE}`, {
-    cwd: decksDir,
-    onlyFiles: true,
-    ignore: ["_template/**", "node_modules/**"],
-  });
+  const entries = findEntryFiles(decksDir);
 
   return entries
     .map((entry) => {
