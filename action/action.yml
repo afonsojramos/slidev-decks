@@ -45,7 +45,6 @@ runs:
       shell: bash
       run: |
         slidev-decks build --all --base "${{ inputs.base }}"
-        slidev-decks index --base "${{ inputs.base }}"
         echo "dist-path=dist" >> $GITHUB_OUTPUT
 
     - name: List built decks
