@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/afonsojramos/slidev-decks/compare/v0.3.0...v0.3.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* add node types to tsconfig for CI typecheck ([b63f1c3](https://github.com/afonsojramos/slidev-decks/commit/b63f1c3460d9e92dc9ae3dac0d8298bd6fa5f479))
+* remove redundant index generation from composite action ([c35f2ac](https://github.com/afonsojramos/slidev-decks/commit/c35f2ac426ef09073e0f22545c5d6c4fe8e8a311))
+
 ## [0.3.0](https://github.com/afonsojramos/slidev-decks/compare/v0.2.0...v0.3.0) (2026-03-31)
 
 
