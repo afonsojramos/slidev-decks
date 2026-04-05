@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.2](https://github.com/afonsojramos/slidev-decks/compare/v0.3.1...v0.3.2) (2026-04-05)
+
+
+### Bug Fixes
+
+* add node types to tsconfig for CI typecheck ([1c1f6e3](https://github.com/afonsojramos/slidev-decks/commit/1c1f6e327c76cf79d54f10373485e9709e4e1af3))
+* remove redundant index generation from composite action ([c384e44](https://github.com/afonsojramos/slidev-decks/commit/c384e447e0b6f99db2321f7e45b58ccaa1a17516))
+* update tsdown to v0.21.7 and use bun in release workflow ([#10](https://github.com/afonsojramos/slidev-decks/issues/10)) ([bf8ec9f](https://github.com/afonsojramos/slidev-decks/commit/bf8ec9f9c2d324436536b54a30207b455e0d08bd))
+* update tsdown to v0.21.7 for TypeScript 6 peer dep support ([360c4ff](https://github.com/afonsojramos/slidev-decks/commit/360c4ff9561bffdfc915b6985d0bc71a9e4e4a2f))
+
 ## [0.3.1](https://github.com/afonsojramos/slidev-decks/compare/v0.3.0...v0.3.1) (2026-04-05)
 
 
