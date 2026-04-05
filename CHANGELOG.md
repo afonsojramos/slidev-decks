@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/afonsojramos/slidev-decks/compare/v0.3.2...v0.4.0) (2026-04-05)
+
+
+### Bug Fixes
+
+* update tsdown to v0.21.7 and use bun in release workflow ([#10](https://github.com/afonsojramos/slidev-decks/issues/10)) ([bf8ec9f](https://github.com/afonsojramos/slidev-decks/commit/bf8ec9f9c2d324436536b54a30207b455e0d08bd))
+* update tsdown to v0.21.7 for TypeScript 6 peer dep support ([360c4ff](https://github.com/afonsojramos/slidev-decks/commit/360c4ff9561bffdfc915b6985d0bc71a9e4e4a2f))
+
 ## [0.3.2](https://github.com/afonsojramos/slidev-decks/compare/v0.3.1...v0.3.2) (2026-04-05)
 
 
