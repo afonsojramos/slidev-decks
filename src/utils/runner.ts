@@ -1,6 +1,6 @@
 import { existsSync } from "fs";
-import { join } from "path";
-import { spawn } from "child_process";
+import { join, resolve } from "path";
+import { spawn, spawnSync } from "child_process";
 
 type PackageManager = "bun" | "pnpm" | "npm" | "yarn";
 
@@ -24,11 +24,14 @@ function getRunnerCommand(pm: PackageManager): string {
   }
 }
 
-export function runSlidev(deckPath: string, command: string, args: string[] = []): Promise<number> {
-  // Walk up to find the lockfile / root
+export function findProjectRoot(deckPath: string): string {
   let root = deckPath;
-  for (let i = 0; i < 5; i++) {
+  const fsRoot = resolve("/");
+
+  while (root !== fsRoot) {
     const parent = join(root, "..");
+    if (parent === root) break;
+
     if (
       existsSync(join(parent, "package.json")) &&
       (existsSync(join(parent, "bun.lock")) ||
@@ -43,6 +46,22 @@ export function runSlidev(deckPath: string, command: string, args: string[] = []
     }
   }
 
+  return root;
+}
+
+export function checkSlidevInstalled(pm: PackageManager, cwd: string): boolean {
+  const runner = getRunnerCommand(pm);
+  const [cmd, ...runnerArgs] = runner.split(" ");
+  const result = spawnSync(cmd, [...runnerArgs, "slidev", "--version"], {
+    cwd,
+    stdio: "pipe",
+    shell: false,
+  });
+  return result.status === 0;
+}
+
+export function runSlidev(deckPath: string, command: string, args: string[] = []): Promise<number> {
+  const root = findProjectRoot(deckPath);
   const pm = detectPackageManager(root);
   const runner = getRunnerCommand(pm);
   const [cmd, ...runnerArgs] = runner.split(" ");
@@ -51,14 +70,23 @@ export function runSlidev(deckPath: string, command: string, args: string[] = []
     Boolean,
   );
 
-  return new Promise((resolve) => {
+  return new Promise((res) => {
     const child = spawn(cmd, fullArgs, {
       cwd: deckPath,
       stdio: "inherit",
       shell: false,
     });
 
-    child.on("close", (code: number | null) => resolve(code ?? 1));
-    child.on("error", () => resolve(1));
+    child.on("close", (code: number | null) => res(code ?? 1));
+    child.on("error", (err) => {
+      if ("code" in err && err.code === "ENOENT") {
+        console.error(
+          `Error: "${cmd}" not found. Make sure ${pm} is installed and available in your PATH.`,
+        );
+      } else {
+        console.error(`Error running slidev: ${err.message}`);
+      }
+      res(1);
+    });
   });
 }

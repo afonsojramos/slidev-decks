@@ -2,7 +2,12 @@ import { intro, outro, spinner } from "@clack/prompts";
 import pc from "picocolors";
 import { discoverDecks, fuzzyMatch } from "../utils/discover.js";
 import { resolveDeck } from "../utils/picker.js";
-import { runSlidev } from "../utils/runner.js";
+import {
+  runSlidev,
+  findProjectRoot,
+  detectPackageManager,
+  checkSlidevInstalled,
+} from "../utils/runner.js";
 import { generateIndexHtml } from "./index.js";
 import { join } from "path";
 import { mkdirSync, writeFileSync } from "fs";
@@ -17,6 +22,17 @@ export async function build(
 
   if (decks.length === 0) {
     console.error(pc.red("No decks found."));
+    process.exit(1);
+  }
+
+  // Check if Slidev is installed before proceeding
+  const root = findProjectRoot(decks[0].path);
+  const pm = detectPackageManager(root);
+  if (!checkSlidevInstalled(pm, root)) {
+    console.error(
+      pc.red("Slidev is not installed.") +
+        ` Run ${pc.cyan(`${pm === "npm" ? "npm install" : `${pm} add`} -D @slidev/cli`)} to install it.`,
+    );
     process.exit(1);
   }
 
