@@ -19,7 +19,7 @@ export function generateIndexHtml(
 ): string {
   const rows = decks
     .map((d) => {
-      const href = `${base.replace(/\/$/, "")}/${encodeURI(d.name)}/`;
+      const href = `${base.replace(/\/$/, "")}/${encodeURIComponent(d.name)}/`;
       const date = d.date ? `<span class="date">${escapeHtml(d.date)}</span>` : "";
       const author = d.author ? `<span class="author">${escapeHtml(d.author)}</span>` : "";
       const meta = [date, author].filter(Boolean).join(" · ");

@@ -72,9 +72,10 @@ describe("generateIndexHtml", () => {
   });
 
   it("encodes special characters in href", () => {
-    const decks = [{ name: "my talk with spaces", title: "Test" }];
+    const decks = [{ name: "my talk?q=foo", title: "Test" }];
     const html = generateIndexHtml(decks, "/");
-    expect(html).toContain("my%20talk%20with%20spaces");
+    expect(html).toContain(encodeURIComponent("my talk?q=foo"));
+    expect(html).not.toContain("my talk?q=foo/");
   });
 
   it("strips trailing slash from base before building href", () => {
