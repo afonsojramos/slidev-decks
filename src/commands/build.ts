@@ -1,60 +1,12 @@
 import { intro, outro, spinner } from "@clack/prompts";
 import pc from "picocolors";
-import { discoverDecks, fuzzyMatch, type Deck } from "../utils/discover.js";
+import { discoverDecks, fuzzyMatch } from "../utils/discover.js";
+import { matchesFilter, needsRebuild } from "../utils/fs.js";
 import { resolveDeck } from "../utils/picker.js";
 import { runSlidev, ensureSlidevInstalled } from "../utils/runner.js";
 import { generateIndexHtml } from "./index.js";
 import { join } from "path";
-import { mkdirSync, writeFileSync, statSync, lstatSync, existsSync, readdirSync } from "fs";
-
-export function matchesFilter(name: string, pattern: string): boolean {
-  try {
-    const regex = new RegExp(
-      "^" +
-        pattern
-          .replace(/[.+^${}()|[\]\\-]/g, "\\$&")
-          .replace(/\*\*/g, "{{GLOBSTAR}}")
-          .replace(/\*/g, "[^/]*")
-          .replace(/\?/g, "[^/]")
-          .replace(/\{\{GLOBSTAR\}\}/g, ".*") +
-        "$",
-    );
-    return regex.test(name);
-  } catch {
-    return pattern === name;
-  }
-}
-
-export function needsRebuild(deck: Deck, outDir: string): boolean {
-  const builtIndex = join(outDir, "index.html");
-  if (!existsSync(builtIndex)) return true;
-
-  const builtMtime = statSync(builtIndex).mtimeMs;
-
-  return isNewerThan(deck.path, builtMtime);
-}
-
-function isNewerThan(dir: string, threshold: number): boolean {
-  if (!existsSync(dir)) return true;
-  const entries = readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (entry.name === "node_modules" || entry.name === ".slidev") continue;
-    const full = join(dir, entry.name);
-    try {
-      const stat = lstatSync(full);
-      if (stat.isSymbolicLink()) continue;
-      if (stat.isDirectory()) {
-        if (isNewerThan(full, threshold)) return true;
-      } else {
-        if (stat.mtimeMs > threshold) return true;
-      }
-    } catch {
-      // Permission denied or broken path — skip
-      continue;
-    }
-  }
-  return false;
-}
+import { mkdirSync, writeFileSync } from "fs";
 
 export interface BuildOptions {
   base?: string;

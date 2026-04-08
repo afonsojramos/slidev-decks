@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { join } from "path";
 import { mkdirSync, writeFileSync, rmSync, utimesSync } from "fs";
-import { matchesFilter, needsRebuild } from "../src/commands/build";
+import { matchesFilter, needsRebuild } from "../src/utils/fs";
 
 describe("matchesFilter", () => {
   it("matches exact name", () => {
