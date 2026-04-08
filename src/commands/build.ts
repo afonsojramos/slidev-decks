@@ -10,9 +10,9 @@ import {
 } from "../utils/runner.js";
 import { generateIndexHtml } from "./index.js";
 import { join } from "path";
-import { mkdirSync, writeFileSync, statSync, existsSync } from "fs";
+import { mkdirSync, writeFileSync, statSync, existsSync, readdirSync } from "fs";
 
-function matchesFilter(name: string, pattern: string): boolean {
+export function matchesFilter(name: string, pattern: string): boolean {
   // Convert glob pattern to regex: * → [^/]*, ? → [^/], ** → .*
   const regex = new RegExp(
     "^" +
@@ -27,7 +27,7 @@ function matchesFilter(name: string, pattern: string): boolean {
   return regex.test(name);
 }
 
-function needsRebuild(deck: Deck, outDir: string): boolean {
+export function needsRebuild(deck: Deck, outDir: string): boolean {
   const builtIndex = join(outDir, "index.html");
   if (!existsSync(builtIndex)) return true;
 
@@ -39,7 +39,6 @@ function needsRebuild(deck: Deck, outDir: string): boolean {
 
 function isNewerThan(dir: string, threshold: number): boolean {
   if (!existsSync(dir)) return true;
-  const { readdirSync } = require("fs");
   const entries = readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
     if (entry.name === "node_modules" || entry.name === ".slidev") continue;

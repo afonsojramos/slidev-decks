@@ -25,12 +25,12 @@ function getRunnerCommand(pm: PackageManager): string {
 }
 
 export function findProjectRoot(deckPath: string): string {
-  let root = deckPath;
+  let current = resolve(deckPath);
   const fsRoot = resolve("/");
 
-  while (root !== fsRoot) {
-    const parent = join(root, "..");
-    if (parent === root) break;
+  while (current !== fsRoot) {
+    const parent = resolve(current, "..");
+    if (parent === current) break;
 
     if (
       existsSync(join(parent, "package.json")) &&
@@ -40,13 +40,13 @@ export function findProjectRoot(deckPath: string): string {
         existsSync(join(parent, "yarn.lock")) ||
         existsSync(join(parent, "package-lock.json")))
     ) {
-      root = parent;
-    } else {
-      break;
+      return parent;
     }
+
+    current = parent;
   }
 
-  return root;
+  return deckPath;
 }
 
 export function checkSlidevInstalled(pm: PackageManager, cwd: string): boolean {
