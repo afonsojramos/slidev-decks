@@ -88,6 +88,7 @@ export function fuzzyScore(target: string, query: string): number {
   const t = target.toLowerCase();
   const q = query.toLowerCase();
 
+  if (q.length === 0) return 0;
   if (t === q) return 100;
   if (t.startsWith(q)) return 80;
   if (t.includes(q)) return 60;

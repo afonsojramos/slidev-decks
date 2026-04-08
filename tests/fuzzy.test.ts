@@ -36,8 +36,8 @@ describe("fuzzyScore", () => {
     expect(fuzzyScore("abc", "ba")).toBe(0);
   });
 
-  it("handles empty query", () => {
-    expect(fuzzyScore("hello", "")).toBe(80); // starts with empty string
+  it("returns 0 for empty query", () => {
+    expect(fuzzyScore("hello", "")).toBe(0);
   });
 
   it("handles single-word query not triggering word match", () => {
