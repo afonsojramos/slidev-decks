@@ -19,7 +19,9 @@ export async function newDeck(nameArg?: string) {
     const pkg = JSON.parse(readFileSync(join(cwd, "package.json"), "utf-8"));
     if (typeof pkg.author === "string") pkgAuthor = pkg.author;
     else if (pkg.author?.name) pkgAuthor = pkg.author.name;
-  } catch {}
+  } catch {
+    // No package.json or invalid JSON — not an error, author will be prompted
+  }
 
   const now = new Date();
   const datePrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;

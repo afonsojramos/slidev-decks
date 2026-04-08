@@ -53,7 +53,10 @@ export function discoverDecks(cwd: string): Deck[] {
         if (data.title) title = data.title;
         if (data.date) date = data.date;
         if (data.author) author = data.author;
-      } catch {}
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(`  Warning: could not read ${fullPath}: ${msg}`);
+      }
 
       // Try to extract date from folder name (e.g., 2026-03-ai-talk)
       const dateMatch = name.match(/^(\d{4}-\d{2})/);
