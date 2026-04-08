@@ -37,11 +37,13 @@ runs:
 
     - name: Install slidev-decks
       shell: bash
+      env:
+        SLIDEV_DECKS_VERSION: ${{ inputs.slidev-decks-version }}
       run: |
-        if [ "${{ inputs.slidev-decks-version }}" = "local" ]; then
+        if [ "$SLIDEV_DECKS_VERSION" = "local" ]; then
           echo "Using locally installed slidev-decks from project dependencies"
         else
-          npm install -g "slidev-decks@${{ inputs.slidev-decks-version }}"
+          npm install -g "slidev-decks@${SLIDEV_DECKS_VERSION}"
         fi
 
     - name: Install Playwright for PDF export
@@ -52,11 +54,14 @@ runs:
     - name: Build all decks
       id: build
       shell: bash
+      env:
+        SLIDEV_DECKS_VERSION: ${{ inputs.slidev-decks-version }}
+        BASE_PATH: ${{ inputs.base }}
       run: |
-        if [ "${{ inputs.slidev-decks-version }}" = "local" ]; then
-          npx slidev-decks build --all --base "${{ inputs.base }}" --continue-on-error
+        if [ "$SLIDEV_DECKS_VERSION" = "local" ]; then
+          npx slidev-decks build --all --base "$BASE_PATH" --continue-on-error
         else
-          slidev-decks build --all --base "${{ inputs.base }}" --continue-on-error
+          slidev-decks build --all --base "$BASE_PATH" --continue-on-error
         fi
         echo "dist-path=dist" >> $GITHUB_OUTPUT
 
