@@ -4,19 +4,28 @@ import { discoverDecks } from "../utils/discover.js";
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function generateIndexHtml(
   decks: { name: string; title: string; date?: string; author?: string }[],
   base: string,
 ): string {
   const rows = decks
     .map((d) => {
-      const href = `${base.replace(/\/$/, "")}/${d.name}/`;
-      const date = d.date ? `<span class="date">${d.date}</span>` : "";
-      const author = d.author ? `<span class="author">${d.author}</span>` : "";
+      const href = `${base.replace(/\/$/, "")}/${encodeURI(d.name)}/`;
+      const date = d.date ? `<span class="date">${escapeHtml(d.date)}</span>` : "";
+      const author = d.author ? `<span class="author">${escapeHtml(d.author)}</span>` : "";
       const meta = [date, author].filter(Boolean).join(" · ");
 
       return `    <li>
-      <a href="${href}">${d.title}</a>
+      <a href="${href}">${escapeHtml(d.title)}</a>
       ${meta ? `<div class="meta">${meta}</div>` : ""}
     </li>`;
     })
