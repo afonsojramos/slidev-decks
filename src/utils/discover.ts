@@ -73,7 +73,50 @@ export function discoverDecks(cwd: string): Deck[] {
     });
 }
 
-export function fuzzyMatch(decks: Deck[], query: string): Deck[] {
+/**
+ * Score how well a query matches a target string.
+ * Returns 0 for no match, higher is better.
+ *
+ * Scoring priorities:
+ * - Exact match: 100
+ * - Starts with query: 80
+ * - Substring match: 60
+ * - All query words found: 40
+ * - Subsequence match (characters in order): 20
+ */
+export function fuzzyScore(target: string, query: string): number {
+  const t = target.toLowerCase();
   const q = query.toLowerCase();
-  return decks.filter((d) => d.name.toLowerCase().includes(q) || d.title.toLowerCase().includes(q));
+
+  if (t === q) return 100;
+  if (t.startsWith(q)) return 80;
+  if (t.includes(q)) return 60;
+
+  // Word matching: all query words must appear somewhere in target
+  const queryWords = q.split(/[\s-]+/).filter(Boolean);
+  if (queryWords.length > 1) {
+    const allWordsFound = queryWords.every((w) => t.includes(w));
+    if (allWordsFound) return 40;
+  }
+
+  // Subsequence match: all query chars appear in order
+  let ti = 0;
+  for (let qi = 0; qi < q.length; qi++) {
+    const idx = t.indexOf(q[qi], ti);
+    if (idx === -1) return 0;
+    ti = idx + 1;
+  }
+  return 20;
+}
+
+export function fuzzyMatch(decks: Deck[], query: string): Deck[] {
+  const scored = decks
+    .map((d) => ({
+      deck: d,
+      score: Math.max(fuzzyScore(d.name, query), fuzzyScore(d.title, query)),
+    }))
+    .filter((s) => s.score > 0)
+    .toSorted((a, b) => b.score - a.score);
+
+  return scored.map((s) => s.deck);
 }
