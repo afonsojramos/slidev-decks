@@ -3,6 +3,12 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Force publish to npm (skip release-please)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -21,7 +27,7 @@ jobs:
 
   publish:
     needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
+    if: needs.release-please.outputs.release_created == 'true' || github.event.inputs.publish == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
