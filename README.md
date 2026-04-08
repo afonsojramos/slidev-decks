@@ -35,6 +35,8 @@ sd new 2026-04-my-talk      # pre-fill name, wizard for the rest
 sd build ai                 # build for production
 sd build ai --base /talks/  # build with custom base path
 sd build --all              # build all decks into dist/<name>/
+sd build --all -f "2026-*"  # build only matching decks
+sd build --all --continue-on-error  # keep going on failures
 sd export ai --dark         # export to PDF/PNG/PPTX
 sd list                     # list all decks with titles and dates
 ```
@@ -50,6 +52,8 @@ Any flags `slidev-decks` doesn't recognize are forwarded directly to Slidev.
 **Package Manager Detection** — Automatically uses bun, pnpm, npm, or yarn based on your lockfile.
 
 **Frontmatter Metadata** — Reads `title`, `date`, and `author` from each deck's `slides.md` for the picker and `list` output. Also extracts dates from folder names (e.g., `2026-03-my-talk`).
+
+**Incremental Builds** — `build --all` automatically skips decks that haven't changed since the last build, based on file modification times.
 
 **Templates** — Supports multiple local templates via the `_template-*` naming convention. Templates use `{{PLACEHOLDER}}` syntax (`{{TITLE}}`, `{{SUBTITLE}}`, `{{AUTHOR}}`, `{{YEAR}}`, `{{NAME}}`, `{{DESCRIPTION}}`) that gets replaced during deck creation. `init` offers a choice between a minimal and a styled starting template.
 
@@ -116,10 +120,11 @@ jobs:
 
 The action builds every deck into `dist/<deck-name>/`, generates an `index.html`, and outputs the `dist` path for deployment.
 
-| Input             | Default  | Description                     |
-| ----------------- | -------- | ------------------------------- |
-| `base`            | `/`      | Base path for deployment        |
-| `install-command` | `npm ci` | Command to install dependencies |
+| Input                  | Default  | Description                                                                     |
+| ---------------------- | -------- | ------------------------------------------------------------------------------- |
+| `base`                 | `/`      | Base path for deployment                                                        |
+| `install-command`      | `npm ci` | Command to install dependencies                                                 |
+| `slidev-decks-version` | `local`  | Version to install globally (`local` uses the version from your `package.json`) |
 
 ## Prior Art
 
