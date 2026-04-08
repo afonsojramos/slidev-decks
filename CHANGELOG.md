@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.0.0](https://github.com/afonsojramos/slidev-decks/compare/v0.4.0...v1.0.0) (2026-04-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* release v1.0.0
+
+### Features
+
+* add --filter, --continue-on-error, progress counter, and incremental builds ([0918d60](https://github.com/afonsojramos/slidev-decks/commit/0918d60e5e910840f8fc17f91820a28078869c01))
+* check Slidev availability before spawning commands ([03e0824](https://github.com/afonsojramos/slidev-decks/commit/03e0824113d62eb7afb2f343405d3afe9846f647))
+* improve fuzzy matching with scoring, word matching, and subsequence support ([217e52c](https://github.com/afonsojramos/slidev-decks/commit/217e52cbc239d3bc8c42df8f4b477d752c4c65c0))
+* release v1.0.0 ([2cbc510](https://github.com/afonsojramos/slidev-decks/commit/2cbc510213cb7bf74d859453b2b8a3bb35659f42))
+* support pinned version and local install in GitHub Action ([423f44c](https://github.com/afonsojramos/slidev-decks/commit/423f44c523db7547ba67f88dc5f1a3446845dbad))
+
+
+### Bug Fixes
+
+* align Node version to 22 across CI and action to match engines requirement ([e289d70](https://github.com/afonsojramos/slidev-decks/commit/e289d7094d8c4d12433a1558e4b39a449ddf68c4))
+* align release workflow Node version to 22 ([5acca19](https://github.com/afonsojramos/slidev-decks/commit/5acca19fed39d93f5f6a50b0335c560cbd77a5f9))
+* escape HTML entities in index page to prevent XSS ([28050c9](https://github.com/afonsojramos/slidev-decks/commit/28050c91c5c5c619e843846ad207235659fbb411))
+* log warnings for frontmatter parse failures instead of swallowing silently ([366c407](https://github.com/afonsojramos/slidev-decks/commit/366c407307b579fd082800985de4465127faec46))
+* prevent shell injection in GitHub Action by using env vars ([9cb21d5](https://github.com/afonsojramos/slidev-decks/commit/9cb21d58a4c7877ceabeaf64a0bad8fb6b4b19f4))
+* return 0 for empty query in fuzzyScore ([efc252d](https://github.com/afonsojramos/slidev-decks/commit/efc252d6dae76c64b264c580d364fe1bb39859ba))
+* use encodeURIComponent for path segments in index page hrefs ([f1317db](https://github.com/afonsojramos/slidev-decks/commit/f1317db4a83147ab8a902e150b7544ed68ba9179))
+* walk through intermediate dirs in findProjectRoot and export build helpers ([64ff0dd](https://github.com/afonsojramos/slidev-decks/commit/64ff0dd221159d626063b0791f7ad93bda52adfd))
+
 ## [0.4.0](https://github.com/afonsojramos/slidev-decks/compare/v0.3.2...v0.4.0) (2026-04-05)
 
 
