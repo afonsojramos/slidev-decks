@@ -2,12 +2,7 @@ import { outro } from "@clack/prompts";
 import pc from "picocolors";
 import { discoverDecks, fuzzyMatch } from "../utils/discover.js";
 import { resolveDeck } from "../utils/picker.js";
-import {
-  runSlidev,
-  findProjectRoot,
-  detectPackageManager,
-  checkSlidevInstalled,
-} from "../utils/runner.js";
+import { runSlidev, ensureSlidevInstalled } from "../utils/runner.js";
 
 export async function dev(
   query?: string,
@@ -24,16 +19,7 @@ export async function dev(
     process.exit(1);
   }
 
-  // Check if Slidev is installed before proceeding
-  const root = findProjectRoot(decks[0].path);
-  const pm = detectPackageManager(root);
-  if (!checkSlidevInstalled(pm, root)) {
-    console.error(
-      pc.red("Slidev is not installed.") +
-        ` Run ${pc.cyan(`${pm === "npm" ? "npm install" : `${pm} add`} -D @slidev/cli`)} to install it.`,
-    );
-    process.exit(1);
-  }
+  ensureSlidevInstalled(decks);
 
   if (options.latest) {
     const deck = decks[0];

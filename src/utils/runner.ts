@@ -1,6 +1,8 @@
 import { existsSync } from "fs";
 import { join, resolve } from "path";
-import { spawn, spawnSync } from "child_process";
+import { spawn } from "child_process";
+import pc from "picocolors";
+import type { Deck } from "./discover.js";
 
 type PackageManager = "bun" | "pnpm" | "npm" | "yarn";
 
@@ -24,40 +26,47 @@ function getRunnerCommand(pm: PackageManager): string {
   }
 }
 
+function hasLockfile(dir: string): boolean {
+  return (
+    existsSync(join(dir, "bun.lock")) ||
+    existsSync(join(dir, "bun.lockb")) ||
+    existsSync(join(dir, "pnpm-lock.yaml")) ||
+    existsSync(join(dir, "yarn.lock")) ||
+    existsSync(join(dir, "package-lock.json"))
+  );
+}
+
 export function findProjectRoot(deckPath: string): string {
   let current = resolve(deckPath);
   const fsRoot = resolve("/");
 
   while (current !== fsRoot) {
-    const parent = resolve(current, "..");
-    if (parent === current) break;
-
-    if (
-      existsSync(join(parent, "package.json")) &&
-      (existsSync(join(parent, "bun.lock")) ||
-        existsSync(join(parent, "bun.lockb")) ||
-        existsSync(join(parent, "pnpm-lock.yaml")) ||
-        existsSync(join(parent, "yarn.lock")) ||
-        existsSync(join(parent, "package-lock.json")))
-    ) {
-      return parent;
+    if (existsSync(join(current, "package.json")) && hasLockfile(current)) {
+      return current;
     }
 
+    const parent = resolve(current, "..");
+    if (parent === current) break;
     current = parent;
   }
 
   return deckPath;
 }
 
-export function checkSlidevInstalled(pm: PackageManager, cwd: string): boolean {
-  const runner = getRunnerCommand(pm);
-  const [cmd, ...runnerArgs] = runner.split(" ");
-  const result = spawnSync(cmd, [...runnerArgs, "slidev", "--version"], {
-    cwd,
-    stdio: "pipe",
-    shell: false,
-  });
-  return result.status === 0;
+export function checkSlidevInstalled(root: string): boolean {
+  return existsSync(join(root, "node_modules", "@slidev", "cli"));
+}
+
+export function ensureSlidevInstalled(decks: Deck[]): void {
+  const root = findProjectRoot(decks[0].path);
+  const pm = detectPackageManager(root);
+  if (!checkSlidevInstalled(root)) {
+    console.error(
+      pc.red("Slidev is not installed.") +
+        ` Run ${pc.cyan(`${pm === "npm" ? "npm install" : `${pm} add`} -D @slidev/cli`)} to install it.`,
+    );
+    process.exit(1);
+  }
 }
 
 export function runSlidev(deckPath: string, command: string, args: string[] = []): Promise<number> {

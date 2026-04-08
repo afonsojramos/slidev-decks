@@ -2,29 +2,27 @@ import { intro, outro, spinner } from "@clack/prompts";
 import pc from "picocolors";
 import { discoverDecks, fuzzyMatch, type Deck } from "../utils/discover.js";
 import { resolveDeck } from "../utils/picker.js";
-import {
-  runSlidev,
-  findProjectRoot,
-  detectPackageManager,
-  checkSlidevInstalled,
-} from "../utils/runner.js";
+import { runSlidev, ensureSlidevInstalled } from "../utils/runner.js";
 import { generateIndexHtml } from "./index.js";
 import { join } from "path";
-import { mkdirSync, writeFileSync, statSync, existsSync, readdirSync } from "fs";
+import { mkdirSync, writeFileSync, statSync, lstatSync, existsSync, readdirSync } from "fs";
 
 export function matchesFilter(name: string, pattern: string): boolean {
-  // Convert glob pattern to regex: * → [^/]*, ? → [^/], ** → .*
-  const regex = new RegExp(
-    "^" +
-      pattern
-        .replace(/[.+^${}()|[\]\\]/g, "\\$&")
-        .replace(/\*\*/g, "{{GLOBSTAR}}")
-        .replace(/\*/g, "[^/]*")
-        .replace(/\?/g, "[^/]")
-        .replace(/\{\{GLOBSTAR\}\}/g, ".*") +
-      "$",
-  );
-  return regex.test(name);
+  try {
+    const regex = new RegExp(
+      "^" +
+        pattern
+          .replace(/[.+^${}()|[\]\\-]/g, "\\$&")
+          .replace(/\*\*/g, "{{GLOBSTAR}}")
+          .replace(/\*/g, "[^/]*")
+          .replace(/\?/g, "[^/]")
+          .replace(/\{\{GLOBSTAR\}\}/g, ".*") +
+        "$",
+    );
+    return regex.test(name);
+  } catch {
+    return pattern === name;
+  }
 }
 
 export function needsRebuild(deck: Deck, outDir: string): boolean {
@@ -33,7 +31,6 @@ export function needsRebuild(deck: Deck, outDir: string): boolean {
 
   const builtMtime = statSync(builtIndex).mtimeMs;
 
-  // Check if any source files in the deck directory are newer than the built output
   return isNewerThan(deck.path, builtMtime);
 }
 
@@ -43,26 +40,32 @@ function isNewerThan(dir: string, threshold: number): boolean {
   for (const entry of entries) {
     if (entry.name === "node_modules" || entry.name === ".slidev") continue;
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (isNewerThan(full, threshold)) return true;
-    } else {
-      if (statSync(full).mtimeMs > threshold) return true;
+    try {
+      const stat = lstatSync(full);
+      if (stat.isSymbolicLink()) continue;
+      if (stat.isDirectory()) {
+        if (isNewerThan(full, threshold)) return true;
+      } else {
+        if (stat.mtimeMs > threshold) return true;
+      }
+    } catch {
+      // Permission denied or broken path — skip
+      continue;
     }
   }
   return false;
 }
 
-export async function build(
-  query?: string,
-  options: {
-    base?: string;
-    out?: string;
-    all?: boolean;
-    filter?: string;
-    continueOnError?: boolean;
-    passthrough?: string[];
-  } = {},
-) {
+export interface BuildOptions {
+  base?: string;
+  out?: string;
+  all?: boolean;
+  filter?: string;
+  continueOnError?: boolean;
+  passthrough?: string[];
+}
+
+export async function build(query?: string, options: BuildOptions = {}) {
   const cwd = process.cwd();
   const decks = discoverDecks(cwd);
   const extra = options.passthrough || [];
@@ -72,16 +75,7 @@ export async function build(
     process.exit(1);
   }
 
-  // Check if Slidev is installed before proceeding
-  const root = findProjectRoot(decks[0].path);
-  const pm = detectPackageManager(root);
-  if (!checkSlidevInstalled(pm, root)) {
-    console.error(
-      pc.red("Slidev is not installed.") +
-        ` Run ${pc.cyan(`${pm === "npm" ? "npm install" : `${pm} add`} -D @slidev/cli`)} to install it.`,
-    );
-    process.exit(1);
-  }
+  ensureSlidevInstalled(decks);
 
   if (options.all) {
     let targetDecks = decks;
@@ -133,11 +127,11 @@ export async function build(
       }
     }
 
-    // Generate index page
+    // Generate index page for built decks only
     const outDir = join(cwd, "dist");
     const base = options.base || "/";
     mkdirSync(outDir, { recursive: true });
-    const html = generateIndexHtml(decks, base);
+    const html = generateIndexHtml(targetDecks, base);
     writeFileSync(join(outDir, "index.html"), html);
 
     const built = targetDecks.length - failed - skipped;
