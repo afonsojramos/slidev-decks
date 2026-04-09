@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/afonsojramos/slidev-decks/compare/v1.0.0...v1.1.0) (2026-04-09)
+
+
+### Features
+
+* support src/slides.md layout for antfu/talks-style repos ([71d2e33](https://github.com/afonsojramos/slidev-decks/commit/71d2e33170406a4b40271360c06388a9660e1bf2))
+
 ## [1.0.0](https://github.com/afonsojramos/slidev-decks/compare/v0.4.0...v1.0.0) (2026-04-08)
 
 
