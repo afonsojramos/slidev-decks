@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/afonsojramos/slidev-decks/compare/v1.1.0...v1.2.0) (2026-04-09)
+
+
+### Features
+
+* add --cache flag to build --all for pre-built deck caching ([81223db](https://github.com/afonsojramos/slidev-decks/commit/81223db5f3a0e2b5c1cc6630ad55b6ca6f441a10))
+
 ## [1.1.0](https://github.com/afonsojramos/slidev-decks/compare/v1.0.0...v1.1.0) (2026-04-09)
 
 
