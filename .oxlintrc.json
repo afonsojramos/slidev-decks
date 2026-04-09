@@ -5,5 +5,5 @@
     "suspicious": "warn",
     "pedantic": "off"
   },
-  "ignorePatterns": ["dist", "node_modules"]
+  "ignorePatterns": ["dist", "node_modules", "test-antfu-talks"]
 }

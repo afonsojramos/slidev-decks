@@ -1,6 +1,6 @@
 import matter from "gray-matter";
 import { readFileSync, readdirSync, existsSync } from "fs";
-import { join, basename, dirname } from "path";
+import { join, dirname } from "path";
 
 export interface Deck {
   name: string;
@@ -13,14 +13,23 @@ export interface Deck {
 
 const DEFAULT_DECKS_DIRS = ["decks", "talks", "presentations", "."];
 const ENTRY_FILE = "slides.md";
+const ENTRY_PATHS = [ENTRY_FILE, join("src", ENTRY_FILE)];
 const IGNORED_DIRS = new Set(["_template", "node_modules"]);
 
 function findEntryFiles(base: string): string[] {
   if (!existsSync(base)) return [];
-  return readdirSync(base, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && !IGNORED_DIRS.has(d.name))
-    .map((d) => join(d.name, ENTRY_FILE))
-    .filter((rel) => existsSync(join(base, rel)));
+  const results: string[] = [];
+  for (const d of readdirSync(base, { withFileTypes: true })) {
+    if (!d.isDirectory() || IGNORED_DIRS.has(d.name)) continue;
+    for (const entry of ENTRY_PATHS) {
+      const rel = join(d.name, entry);
+      if (existsSync(join(base, rel))) {
+        results.push(rel);
+        break;
+      }
+    }
+  }
+  return results;
 }
 
 export function findDecksDir(cwd: string): string | null {
@@ -41,7 +50,9 @@ export function discoverDecks(cwd: string): Deck[] {
     .map((entry) => {
       const fullPath = join(decksDir, entry);
       const deckDir = dirname(fullPath);
-      const name = basename(deckDir);
+      // entry is like "2026-03-talk/slides.md" or "2025-10-25/src/slides.md"
+      // name should always be the top-level folder
+      const name = entry.split("/")[0];
 
       let title = name;
       let date: string | undefined;

@@ -64,6 +64,21 @@ describe("discoverDecks", () => {
   });
 });
 
+describe("discoverDecks with src/ layout", () => {
+  it("discovers decks with slides.md inside src/", () => {
+    const decks = discoverDecks(join(import.meta.dir, "fixtures", "decks-src"));
+    expect(decks).toHaveLength(1);
+    expect(decks[0].name).toBe("2025-10-talk");
+    expect(decks[0].title).toBe("Nested Talk");
+    expect(decks[0].entry).toContain(join("src", "slides.md"));
+  });
+
+  it("sets path to the src/ directory for Slidev execution", () => {
+    const decks = discoverDecks(join(import.meta.dir, "fixtures", "decks-src"));
+    expect(decks[0].path).toContain(join("2025-10-talk", "src"));
+  });
+});
+
 describe("fuzzyMatch", () => {
   const decks = discoverDecks(FIXTURES);
 
