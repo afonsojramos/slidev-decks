@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { join } from "path";
 import { mkdirSync, writeFileSync, rmSync, utimesSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { matchesFilter, needsRebuild } from "../src/utils/fs";
+import { tryCopyFromCache } from "../src/commands/build";
 
 describe("matchesFilter", () => {
   it("matches exact name", () => {
@@ -93,5 +95,62 @@ describe("needsRebuild", () => {
 
     const deck = { name: "test", path: deckDir, entry: join(deckDir, "slides.md"), title: "Test" };
     expect(needsRebuild(deck, outDir)).toBe(false);
+  });
+});
+
+describe("tryCopyFromCache", () => {
+  const TMP = join(import.meta.dir, "__cache_test");
+
+  beforeEach(() => {
+    rmSync(TMP, { recursive: true, force: true });
+    mkdirSync(TMP, { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(TMP, { recursive: true, force: true });
+  });
+
+  it("copies cached deck to output dir", () => {
+    const cacheDir = join(TMP, "cache");
+    const cachedDeck = join(cacheDir, "my-talk");
+    mkdirSync(cachedDeck, { recursive: true });
+    writeFileSync(join(cachedDeck, "index.html"), "<html>cached</html>");
+    writeFileSync(join(cachedDeck, "assets.js"), "console.log('cached')");
+
+    const outDir = join(TMP, "dist", "my-talk");
+    const result = tryCopyFromCache(cacheDir, "my-talk", outDir);
+
+    expect(result).toBe(true);
+    expect(existsSync(join(outDir, "index.html"))).toBe(true);
+    expect(readFileSync(join(outDir, "index.html"), "utf-8")).toBe("<html>cached</html>");
+    expect(existsSync(join(outDir, "assets.js"))).toBe(true);
+  });
+
+  it("returns false when cache dir does not exist", () => {
+    const outDir = join(TMP, "dist", "my-talk");
+    const result = tryCopyFromCache(join(TMP, "nonexistent"), "my-talk", outDir);
+    expect(result).toBe(false);
+    expect(existsSync(outDir)).toBe(false);
+  });
+
+  it("returns false when cached deck has no index.html", () => {
+    const cacheDir = join(TMP, "cache");
+    const cachedDeck = join(cacheDir, "my-talk");
+    mkdirSync(cachedDeck, { recursive: true });
+    writeFileSync(join(cachedDeck, "partial.js"), "incomplete");
+
+    const outDir = join(TMP, "dist", "my-talk");
+    const result = tryCopyFromCache(cacheDir, "my-talk", outDir);
+    expect(result).toBe(false);
+  });
+
+  it("returns false when deck name not in cache", () => {
+    const cacheDir = join(TMP, "cache");
+    mkdirSync(join(cacheDir, "other-talk"), { recursive: true });
+    writeFileSync(join(cacheDir, "other-talk", "index.html"), "<html></html>");
+
+    const outDir = join(TMP, "dist", "my-talk");
+    const result = tryCopyFromCache(cacheDir, "my-talk", outDir);
+    expect(result).toBe(false);
   });
 });

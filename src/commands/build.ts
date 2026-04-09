@@ -6,15 +6,24 @@ import { resolveDeck } from "../utils/picker.js";
 import { runSlidev, ensureSlidevInstalled } from "../utils/runner.js";
 import { generateIndexHtml } from "./index.js";
 import { join } from "path";
-import { mkdirSync, writeFileSync } from "fs";
+import { cpSync, existsSync, mkdirSync, writeFileSync } from "fs";
 
 export interface BuildOptions {
   base?: string;
   out?: string;
   all?: boolean;
   filter?: string;
+  cache?: string;
   continueOnError?: boolean;
   passthrough?: string[];
+}
+
+export function tryCopyFromCache(cacheDir: string, deckName: string, outDir: string): boolean {
+  const cached = join(cacheDir, deckName);
+  if (!existsSync(cached) || !existsSync(join(cached, "index.html"))) return false;
+  mkdirSync(outDir, { recursive: true });
+  cpSync(cached, outDir, { recursive: true });
+  return true;
 }
 
 export async function build(query?: string, options: BuildOptions = {}) {
@@ -44,7 +53,9 @@ export async function build(query?: string, options: BuildOptions = {}) {
     const s = spinner();
     let failed = 0;
     let skipped = 0;
+    let cached = 0;
     const failedNames: string[] = [];
+    const cacheDir = options.cache ? join(cwd, options.cache) : null;
 
     for (let i = 0; i < targetDecks.length; i++) {
       const deck = targetDecks[i];
@@ -59,6 +70,14 @@ export async function build(query?: string, options: BuildOptions = {}) {
         s.start(`${progress} Checking ${pc.bold(deck.name)}`);
         s.stop(`${progress} ${pc.dim("Skipped")} ${deck.name} (unchanged)`);
         skipped++;
+        continue;
+      }
+
+      // Cache: copy pre-built output if available
+      if (cacheDir && tryCopyFromCache(cacheDir, deck.name, outDir)) {
+        s.start(`${progress} Restoring ${pc.bold(deck.name)}`);
+        s.stop(`${progress} ${pc.cyan("Cached")} ${deck.name} → dist/${deck.name}/`);
+        cached++;
         continue;
       }
 
@@ -86,9 +105,10 @@ export async function build(query?: string, options: BuildOptions = {}) {
     const html = generateIndexHtml(targetDecks, base);
     writeFileSync(join(outDir, "index.html"), html);
 
-    const built = targetDecks.length - failed - skipped;
+    const built = targetDecks.length - failed - skipped - cached;
     const parts: string[] = [];
     if (built > 0) parts.push(`${built} built`);
+    if (cached > 0) parts.push(`${cached} cached`);
     if (skipped > 0) parts.push(`${skipped} skipped`);
     if (failed > 0) parts.push(`${failed} failed`);
     const summary = parts.join(", ");

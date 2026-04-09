@@ -46,6 +46,7 @@ cli
   .option("--base <path>", "Base path for deployment")
   .option("-o, --out <dir>", "Output directory")
   .option("-f, --filter <pattern>", "Filter decks by glob pattern (with --all)")
+  .option("--cache <dir>", "Use pre-built cache dir — copy instead of rebuilding (with --all)")
   .option("--continue-on-error", "Continue building remaining decks on failure (with --all)")
   .allowUnknownOptions()
   .action(async (query?: string, options?: Record<string, unknown>) => {
@@ -55,6 +56,7 @@ cli
       base: options?.base as string,
       out: options?.out as string,
       filter: options?.filter as string,
+      cache: options?.cache as string,
       continueOnError: options?.continueOnError as boolean,
       passthrough: (options?.["--"] as string[]) || [],
     });
