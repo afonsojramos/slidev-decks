@@ -29,12 +29,9 @@ Sleep 300ms
 Type `echo '---\ntitle: "{{TITLE}}"\n---\n# {{TITLE}}' > /tmp/demo-talks/decks/_template/slides.md`
 Enter
 Sleep 300ms
-Type `cd /tmp/demo-talks && npm init -y > /dev/null 2>&1 && npm install --silent @slidev/cli @slidev/theme-default > /dev/null 2>&1`
+Type `cd /tmp/demo-talks && npm init -y > /dev/null 2>&1 && npm install --silent @slidev/cli @slidev/theme-default > /dev/null 2>&1 && clear`
 Enter
-Sleep 15s
-Type "clear"
-Enter
-Sleep 300ms
+Sleep 30s
 Show
 
 # List all decks
