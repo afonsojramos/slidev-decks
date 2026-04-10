@@ -31,7 +31,7 @@ Enter
 Sleep 300ms
 Type `cd /tmp/demo-talks && npm init -y > /dev/null 2>&1 && npm install --silent @slidev/cli @slidev/theme-default > /dev/null 2>&1 && clear`
 Enter
-Sleep 30s
+Wait@60s /\$\s*$/
 Show
 
 # List all decks
