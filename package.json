@@ -33,6 +33,7 @@
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt .",
     "fmt:check": "oxfmt --check .",
+    "demo": "vhs docs/demo.tape",
     "prepublishOnly": "npm run build",
     "prepare": "husky"
   },
