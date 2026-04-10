@@ -1,6 +1,6 @@
 {
   "name": "slidev-decks",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "CLI companion for managing multiple Slidev presentations",
   "keywords": [
     "cli",
