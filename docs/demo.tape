@@ -29,9 +29,12 @@ Sleep 300ms
 Type `echo '---\ntitle: "{{TITLE}}"\n---\n# {{TITLE}}' > /tmp/demo-talks/decks/_template/slides.md`
 Enter
 Sleep 300ms
-Type `cd /tmp/demo-talks && npm init -y > /dev/null 2>&1 && npm install --silent @slidev/cli @slidev/theme-default > /dev/null 2>&1 && clear`
+Type `cd /tmp/demo-talks && echo '{"private":true}' > package.json && bun add @slidev/cli @slidev/theme-default slidev-decks > /dev/null 2>&1`
 Enter
-Wait@60s /\$\s*$/
+Wait@60s />/
+Type `export PATH="./node_modules/.bin:$PATH" && clear`
+Enter
+Sleep 500ms
 Show
 
 # List all decks
@@ -46,7 +49,8 @@ Sleep 300ms
 Enter
 Sleep 3s
 
-# Quit slidev
+# Wait for dev server to start, then quit
+Sleep 5s
 Ctrl+C
 Sleep 1s
 
@@ -94,8 +98,4 @@ Sleep 2.5s
 Type `sd build --all --filter "2026-*"`
 Sleep 300ms
 Enter
-Sleep 5s
-
-# Quit
-Ctrl+C
-Sleep 1s
+Sleep 8s
