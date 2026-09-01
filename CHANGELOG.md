@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/afonsojramos/slidev-decks/compare/v1.2.0...v1.2.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* increase setup sleep and clear before show in demo tape ([5c13bae](https://github.com/afonsojramos/slidev-decks/commit/5c13bae526b06625b1121ff54c7cdbed4251c3c0))
+* use VHS Wait command instead of fixed Sleep for setup ([d6448a3](https://github.com/afonsojramos/slidev-decks/commit/d6448a361e5de4427cfada6f7c7bf21532e3a513))
+
 ## [1.2.0](https://github.com/afonsojramos/slidev-decks/compare/v1.1.0...v1.2.0) (2026-04-09)
 
 
