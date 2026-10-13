@@ -1,0 +1,22 @@
+amends "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Config.pkl"
+
+steps {
+  ["lint"] {
+    check = "bun run lint"
+  }
+  ["format"] {
+    check = "bun run fmt:check"
+    depends = "lint"
+  }
+  ["test"] {
+    check = "bun run test"
+    depends = "format"
+  }
+}
+
+hooks {
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+  }
+}
